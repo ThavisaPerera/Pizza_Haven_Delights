@@ -27,7 +27,7 @@
                 <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             </div>
 
-            <div class="flex items-center justify-center mt-4" style=" background-color: #ff6f00; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            <div class="flex items-center justify-center mt-4" style=" background-color: #ff6f00; color: white; border: none; paddigit remote add origin https://github.com/ThavisaPerera/Pizza_Haven_Delights.gitng: 10px 20px; border-radius: 5px; cursor: pointer;">
                 <x-button id="fog-button">
                     {{ __('Email Password Reset Link') }}
                 </x-button>
