@@ -8,4 +8,5 @@
     <link rel="stylesheet" href="admin/assets/vendors/owl-carousel-2/owl.carousel.min.css">
     <link rel="stylesheet" href="admin/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
     <link rel="stylesheet" href="admin/assets/css/style.css">
-    <link rel="shortcut icon" href="admin/assets/images/favicon.png" />
+    <link rel="shortcut icon" href="admin/assets/images/cat-1-1.png" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -10,6 +10,12 @@ use App\Models\Catagory;
 
 use App\Models\Item;
 
+use App\Models\User;
+
+use App\Models\LoyaltyPoints;
+
+use Illuminate\Support\Facades\Auth;
+
 class AdminController extends Controller
 {
     public function view_catagory()
@@ -64,7 +70,12 @@ class AdminController extends Controller
 
         $item->save();
 
-        return redirect()->back()->with('message','Menu Item Added Successfully');
+        $totalPrice = Item::sum('price');
+
+        return view('admin.item', [
+            'totalprice' => $totalPrice,
+            'message' => 'Menu Item Added Successfully',
+        ]);
     }
 
     public function show_item()
@@ -133,7 +144,90 @@ class AdminController extends Controller
 
         $order->save();
 
-        return redirect()->back();
+        $loyaltyPoints = $this->calculateLoyaltyPoints($order->user_id, $order->price);
+        
+        LoyaltyPoints::create([
+            'user_id' => $order->user_id,
+            'order_id' => $order->id,
+            'points' => $loyaltyPoints,
+        ]);
+
+        return redirect()->back()->with('loyaltyPoints', $loyaltyPoints);
+
     }
 
+    private function calculateLoyaltyPoints($userId, $orderAmount)
+    {
+        
+        $basePointsPerDollar = 0.1;
+        $loyaltyPointsEarned = floor($orderAmount * $basePointsPerDollar);
+
+        
+        $bonusThreshold1 = 25; 
+        $bonusPoints1 = 5;
+        $bonusThreshold2 = 50;
+        $bonusPoints2 = 10;
+
+        if ($orderAmount >= $bonusThreshold2) {
+            $loyaltyPointsEarned += $bonusPoints2;
+        } elseif ($orderAmount >= $bonusThreshold1) {
+            $loyaltyPointsEarned += $bonusPoints1;
+        }
+
+        return $loyaltyPointsEarned;
+    }
+
+
+
+    public function user_management()
+    {
+        $users = user::all();
+
+        return view('admin.user_management',compact('users'));
+    }
+
+    public function del_user($id)
+    {
+        $user = user::find($id);
+
+        $user->delete();
+
+        return redirect()->back()->with('message','User Deleted Successfully');
+    }
+
+
+    public function applyDiscount(Request $request)
+{
+    // Retrieve the authenticated user
+    $user = Auth::user();
+
+    // Retrieve cart items associated with the user using the relationship
+    $cart = $user->cartItems;
+
+    // Check if cart is not empty
+    if ($cart->isNotEmpty()) {
+        // Calculate total price based on cart items
+        $totalPrice = $cart->sum('price');
+    } else {
+        $totalPrice = 0; // Set a default value if the cart is empty
+    }
+
+    // Get the loyalty points submitted in the form
+    $loyaltyPointsToApply = $request->input('loyalty_points');
+
+    // Ensure the loyalty points to apply is not greater than the user's total loyalty points
+    $loyaltyPointsToApply = min($loyaltyPointsToApply, $user->loyaltyPoints->sum('points'));
+
+    // Update the discounted price
+    $discountedPrice = $totalPrice - $loyaltyPointsToApply;
+
+    return redirect()->back()->with([
+        'message' => 'Discount applied successfully.',
+        'totalprice' => $discountedPrice,
+    ]);
+}
+
+
+
+    
 }

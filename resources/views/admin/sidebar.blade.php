@@ -59,6 +59,14 @@
           <span class="menu-title">Orders</span>
         </a>
       </li>
+      <li class="nav-item menu-items">
+        <a class="nav-link" href="{{url('user_management')}}">
+          <span class="menu-icon">
+            <i class="mdi mdi-playlist-play"></i>
+          </span>
+          <span class="menu-title">User Management</span>
+        </a>
+      </li>
       
     </ul>
   </nav>

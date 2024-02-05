@@ -65,3 +65,15 @@ Route::get('/order',[HomeController::class,'order']);
 
 Route::get('/view_order',[AdminController::class,'view_order']);
 Route::get('/delivered/{id}',[AdminController::class,'delivered']);
+
+
+Route::get('/user_management',[AdminController::class,'user_management']);
+Route::get('/del_user',[AdminController::class,'del_user']);
+
+Route::post('apply_discount', [AdminController::class, 'applyDiscount'])->name('apply_discount');
+
+Route::get('/show_order',[HomeController::class,'show_order']);
+Route::get('/cancel_order/{id}',[HomeController::class,'cancel_order']);
+
+Route::get('/stripe/{totalprice}',[HomeController::class,'stripe']);
+Route::post('stripe/{totalprice}', [HomeController::class,'stripePost'])->name('stripe.post');

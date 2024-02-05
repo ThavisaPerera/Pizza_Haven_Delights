@@ -25,6 +25,10 @@
                            <a class="nav-link" href="/contact">Contact</a>
                         </li>
 
+                        <li class="nav-item">
+                           <a class="nav-link" href="{{ url('show_order')}}">Order</a>
+                        </li>
+
                         @if (Route::has('login'))
 
                         @auth
@@ -32,6 +36,7 @@
                         <li class="nav-item">
                            <a class="nav-link" href="{{ url('show_cart') }}">Cart</a>
                         </li>
+
 
                         <li class="nav-item">
                            <a class="nav-link" href="{{ route('profile.show') }}">profile</a>

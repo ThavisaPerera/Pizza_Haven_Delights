@@ -14,6 +14,10 @@ use App\Models\Cart;
 
 use App\Models\Order;
 
+use Session;
+
+use Stripe;
+
 class HomeController extends Controller
 {
     
@@ -176,5 +180,92 @@ class HomeController extends Controller
         }
 
         return redirect()->back()->with('message','We Recived Your Order. We Will Connect with You Soon');
+    }
+
+    public function show_order()
+    {
+        if(Auth::id())
+        {
+            $user=Auth::user();
+
+            $userid=$user->id;
+
+            $order = order::where('user_id', '=', $userid)->get();
+            
+            return view('home.order',compact('order'));
+        }
+        else
+        {
+            return redirect ('login');
+        }
+    }
+
+    public function cancel_order($id)
+{
+    $order = order::find($id);
+
+    if ($order) {
+        $order->delivery_status = 'Customer Canceled Order';
+        $order->payment_status = 'Customer Canceled Order';
+        $order->save();
+        return redirect()->back()->with('message', 'Order canceled successfully.');
+    } else {
+        return redirect()->back()->with('error', 'Order not found.');
+    }
+}
+
+public function stripe($totalprice)
+{
+    return view('home.stripe',compact('totalprice'));
+}
+
+public function stripePost(Request $request, $totalprice)
+    {
+
+        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+    
+        Stripe\Charge::create ([
+                "amount" => $totalprice * 100,
+                "currency" => "usd",
+                "source" => $request->stripeToken,
+                "description" => "Payment Recived, Thank You!!" 
+        ]);
+
+        $user = Auth::user();
+
+        $userid = $user->id;
+
+        $data = cart::where('user_id','=',$userid)->get();
+
+        foreach($data as $data)
+        {
+            $order = new order;
+
+            $order->name=$data->name;
+            $order->email=$data->email;
+            $order->phone=$data->phone;
+            $order->address=$data->address;
+            $order->user_id=$data->user_id;
+
+            $order->item_id=$data->id;
+            $order->item_title=$data->item_title;
+            $order->price=$data->price;
+            $order->image=$data->image;
+
+            $order->payment_status='Paid';
+            $order->delivery_status='In Progress';
+
+            $order->save();
+
+            $cart_id = $data->id;
+
+            $cart = cart::find($cart_id);
+
+            $cart->delete();
+        }
+      
+        Session::flash('success', 'Payment successful!');
+              
+        return back();
     }
 }

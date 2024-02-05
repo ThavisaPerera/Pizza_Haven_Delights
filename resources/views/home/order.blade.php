@@ -81,7 +81,7 @@
            <div class="row">
               <div class="col-md-12">
                  <div class="full">
-                    <h3>Cart</h3>
+                    <h3>Order History</h3>
                  </div>
               </div>
            </div>
@@ -107,62 +107,42 @@
                 <th class="th_deg">Image</th>
                 <th class="th_deg">Item Title</th>
                 <th class="th_deg">Price</th>
+                <th class="th_deg">Payment Status</th>
+                <th class="th_deg">Delivery Status</th>
                 <th class="th_deg">Action</th>
             </tr>
-
-            <?php $totalprice=0; ?>
             
-            @foreach($cart as $cart)
+            @foreach($order as $order)
             
             <tr>
-                <td><img class="img_size" src="/item/{{$cart->image}}"></td>
-                <td>{{$cart->item_title}}</td>
-                <td>${{$cart->price}}</td>
-                <td><a class="btn btn-danger" href="{{url('remove_cart',$cart->id)}}">Remove From Cart</a></td>
+                <td><img class="img_size" src="/item/{{$order->image}}"></td>
+                <td>{{$order->item_title}}</td>
+                <td>${{$order->price}}</td>
+                <td>{{$order->payment_status}}</td>
+                <td>{{$order->delivery_status}}</td>
+                <td>
+                    @if($order->delivery_status=='In Progress')
+                    <a class="btn btn-danger" href="{{ url('cancel_order',$order->id)}}">Cancel Order</a>
+                    @else
+                    <p>Order Collected<p>
+                    @endif
+                </td>
             </tr>
             
-            <?php $totalprice=$totalprice + $cart->price ?>
 
             @endforeach
 
         </table>
     </div>
 
-    <section class="inner_page_head">
-        <div class="container_fuild">
-           <div class="row">
-              <div class="col-md-12">
-                <div class="full">
-                    <h3>Total Price: ${{$totalprice}}</h3>
-                    <br>
-                    @if(Auth::user()->loyaltyPoints)
-                    <p>Loyalty Points: {{ Auth::user()->loyaltyPoints->sum('points') }}</p>
-                     @else
-                    <p>No loyalty points available.</p>
-                    @endif
-                    <form action="{{ route('apply_discount') }}" method="post">
-                        <button type="submit" class="btn btn-success">Apply Discount</button>
-                    </form>
-                
-                    @if(isset($totalprice) && isset($user) && $user->loyaltyPoints)
-                        <h3>Total Price (after discount): ${{ max(0, $totalprice - $user->loyaltyPoints->sum('points')) }}</h3>
-                    @else
-                        
-                    @endif
-                    <br>
-                    <a class="btn btn-order" href="{{ url('order') }}">Cash On Delivery</a>
-                    <a class="btn btn-order" href="{{ url('stripe',$totalprice) }}">Card Payment</a>
-                </div>
-                
-           </div>
-        </div>
-     </section>
+
 
 
 
       <!-- footer start -->
       @include('home.footer')
       <!-- footer end -->
+      
       
 
       <script src="home/js/jquery-3.4.1.min.js"></script>

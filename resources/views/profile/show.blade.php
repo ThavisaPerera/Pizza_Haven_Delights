@@ -33,7 +33,13 @@
            <div class="row">
               <div class="col-md-12">
                  <div class="full">
-                    <h3 class="mb-0">{{ Auth::user()->name }}'s Profile</h3>
+                  <h3 class="mb-0">{{ Auth::user()->name }}'s Profile</h3>
+                  <br>
+                  @if(Auth::user()->loyaltyPoints)
+                  <h4>Loyalty Points: {{ Auth::user()->loyaltyPoints->sum('points') }}</h4>
+                  @else
+                  <p>No loyalty points available.</p>
+                  @endif
                  </div>
               </div>
            </div>
